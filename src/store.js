@@ -1,14 +1,14 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import defaultBoard from './default-board'
-import { saveStatePlugin } from './utils.js'
+import { saveStatePlugin, uuid } from './utils.js'
 
 Vue.use(Vuex)
 
 const board = JSON.parse(localStorage.getItem('board')) || defaultBoard
 
 export default new Vuex.Store({
-  plugins: [saveStatePlugin],
+  plugins: [saveStatePlugin, uuid],
   state: {
     board
   },
@@ -25,5 +25,16 @@ export default new Vuex.Store({
       }
     }
   },
-  mutations: {}
+  mutations: {
+    CREATE_TASK (state, { tasks, name }) {
+      tasks.push({
+        name,
+        id: uuid(),
+        description: ''
+      })
+    },
+    UPDATE_TASK (state, { task, key, value }) {
+      Vue.set(task, key, value)
+    }
+  }
 })

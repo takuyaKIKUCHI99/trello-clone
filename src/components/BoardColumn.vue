@@ -1,14 +1,14 @@
 <template>
-  <div
-    class="column"
-    draggable
-    @dragstart.self="pickupColumn($event, columnIndex)"
-    @drop="moveTaskOrColumn($event, column.tasks, columnIndex)"
-    @dragover.prevent
-    @dragenter.prevent>
-    <div class="flex items-center mb-2 font-bold">
-      {{ column.name }}
-    </div>
+  <AppDrop
+    @drop="moveTaskOrColumn"
+  >
+    <AppDrag
+      class="column"
+      :transferData="{type: 'column', fromColumnIndex: columnIndex}"
+    >
+      <div class="flex items-center mb-2 font-bold">
+        {{ column.name }}
+      </div>
       <div class="list-reset">
         <ColumnTask
           v-for="(task, $taskIndex) of column.tasks"
@@ -26,15 +26,18 @@
           @keyup.enter="createTask($event, column.tasks)"
         />
       </div>
-  </div>
+    </AppDrag>
+  </AppDrop>
 </template>
 
 <script>
 import ColumnTask from '@/components/ColumnTask.vue'
+import AppDrag from './AppDrag'
+import AppDrop from './AppDrop'
 import movingTasksAndColumnMixin from '@/mixins/movingTasksAndColumnsMixin.js'
 
 export default {
-  components: { ColumnTask },
+  components: { AppDrag, AppDrop, ColumnTask },
   mixins: [movingTasksAndColumnMixin],
   methods: {
     createTask (event, tasks) {

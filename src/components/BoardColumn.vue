@@ -10,26 +10,15 @@
       {{ column.name }}
     </div>
       <div class="list-reset">
-        <div
-          class="task"
+        <ColumnTask
           v-for="(task, $taskIndex) of column.tasks"
           :key="$taskIndex"
-          draggable
-          @dragstart="pickupTask($event, $taskIndex, columnIndex)"
-          @click="goToTask(task)"
-          @dragover.prevent
-          @dragenter.prevent
-          @drop.stop="moveTaskOrColumn($event, column.tasks, columnIndex, $taskIndex)">
-          <span class="w-full flex-no-shrink font-bold">
-            {{ task.name }}
-          </span>
-          <p
-            v-if="task.description"
-            class="w-full flex-no-shrink mt-1 text-sm"
-          >
-            {{ task.description }}
-          </p>
-        </div>
+          :board="board"
+          :column="column"
+          :task="task"
+          :columnIndex="columnIndex"
+          :taskIndex="$taskIndex"
+        />
         <input
           type="text"
           class="block p-2 w-full bg-transparent"
@@ -41,7 +30,10 @@
 </template>
 
 <script>
+import ColumnTask from '@/components/ColumnTask.vue'
+
 export default {
+  components: { ColumnTask },
   props: {
     board: {
       type: Object,
@@ -60,9 +52,6 @@ export default {
     createTask (event, tasks) {
       this.$store.commit('CREATE_TASK', { tasks, name: event.target.value })
       event.target.value = ''
-    },
-    goToTask (task) {
-      this.$router.push({ name: 'task', params: { id: task.id } })
     },
     moveTaskOrColumn (event, toTasks, toColumnIndex, toTaskIndex) {
       const type = event.dataTransfer.getData('type')
@@ -96,13 +85,6 @@ export default {
       event.dataTransfer.dropEffect = 'move'
       event.dataTransfer.setData('from-column-index', columnIndex)
       event.dataTransfer.setData('type', 'column')
-    },
-    pickupTask (event, taskIndex, fromColumnIndex) {
-      event.dataTransfer.effectAllowed = 'move'
-      event.dataTransfer.dropEffect = 'move'
-      event.dataTransfer.setData('task-index', taskIndex)
-      event.dataTransfer.setData('from-column-index', fromColumnIndex)
-      event.dataTransfer.setData('type', 'task')
     }
   }
 }
@@ -112,9 +94,5 @@ export default {
 .column {
   @apply bg-grey-light p-2 mr-4 text-left shadow rounded;
   min-width: 350px;
-}
-
-.task {
-  @apply flex items-center flex-wrap shadow mb-2 py-2 px-2 rounded bg-white text-grey-darkest no-underline;
 }
 </style>
